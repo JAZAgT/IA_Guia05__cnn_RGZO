@@ -101,12 +101,12 @@ Model: "sequential"
  Non-trainable params: 0 (0.00 B)
 
 --- Entrenando el modelo MNIST (5000 muestras, 1 epoca) ---
-79/79 ━━━━━━━━━━━━━━━━━━━━ 1s 6ms/step - accuracy: 0.7748 - loss: 0.8078
+79/79 ━━━━━━━━━━━━━━━━━━━━ 1s 6ms/step - accuracy: 0.7512 - loss: 0.8471
 
 --- Analizando Resultados de Prediccion (MNIST) ---
 Vector de probabilidades crudas (Softmax):
-[0.000e+00 0.000e+00 0.000e+00 2.000e-04 0.000e+00 0.000e+00 0.000e+00
- 9.997e-01 0.000e+00 0.000e+00]
+[0.000e+00 0.000e+00 0.000e+00 1.600e-03 0.000e+00 1.000e-04 0.000e+00
+ 9.971e-01 0.000e+00 1.200e-03]
 Clase predicha por el modelo: 7
 Clase real de la imagen: 7
 ```
@@ -119,7 +119,7 @@ Clase real de la imagen: 7
 
 **3. Análisis de parámetros y Flatten.** Los parámetros entrenables de `Conv_2` provienen de sus filtros: cada uno de los 64 filtros de `Conv_2` tiene un kernel de 3×3 que se aplica sobre los **32 canales** que entrega `MaxPool_1` (no solo 1 canal), más un sesgo (bias) por filtro. Es decir: `(3 × 3 × 32 + 1) × 64 = (288 + 1) × 64 = 289 × 64 = 18 496`, exactamente el valor que aparece en el resumen. La capa `Flatten` cumple la función de **puente estructural**: convierte el mapa de características tridimensional que entrega `MaxPool_2`, de forma `(5, 5, 64)`, en un vector unidimensional de `5 × 5 × 64 = 1600` valores (tal como muestra `Aplanado_Flatten`), porque las capas `Dense` que siguen solo aceptan vectores planos, no tensores espaciales.
 
-**4. Interpretación del vector Softmax.** El vector impreso, `[0, 0, 0, 0.0002, 0, 0, 0, 0.9997, 0, 0]`, tiene 10 valores — uno por cada dígito posible (0 al 9) — y al sumarlos da **1.0**, porque la función Softmax normaliza las salidas de la red para que representen una distribución de probabilidad válida sobre las clases. `np.argmax()` recorre el vector y devuelve el **índice** de la posición con el valor más alto; en este caso, el índice 7 (valor 0.9997), por lo que la clase predicha es el dígito **7**. Al contrastarlo con `y_test[0]`, la etiqueta real de esa imagen, que también es **7**, confirmamos que la predicción fue correcta, y además con una confianza extremadamente alta (99.97%).
+**4. Interpretación del vector Softmax.** El vector impreso, `[0, 0, 0, 0.0016, 0, 0.0001, 0, 0.9971, 0, 0.0012]`, tiene 10 valores — uno por cada dígito posible (0 al 9) — y al sumarlos da **1.0**, porque la función Softmax normaliza las salidas de la red para que representen una distribución de probabilidad válida sobre las clases. `np.argmax()` recorre el vector y devuelve el **índice** de la posición con el valor más alto; en este caso, el índice 7 (valor 0.9971), por lo que la clase predicha es el dígito **7**. Al contrastarlo con `y_test[0]`, la etiqueta real de esa imagen, que también es **7**, confirmamos que la predicción fue correcta, y además con una confianza muy alta (99.71%).
 
 ## 6. Resultados — Parte 2: Fashion-MNIST
 
@@ -158,12 +158,12 @@ Model: "sequential"
  Non-trainable params: 0 (0.00 B)
 
 --- Entrenando el modelo Fashion-MNIST (5000 muestras, 1 epoca) ---
-79/79 ━━━━━━━━━━━━━━━━━━━━ 1s 6ms/step - accuracy: 0.6404 - loss: 1.0235
+79/79 ━━━━━━━━━━━━━━━━━━━━ 1s 6ms/step - accuracy: 0.6580 - loss: 1.0273
 
 --- Analizando Resultados de Prediccion (Fashion-MNIST) ---
 Vector de probabilidades crudas (Softmax):
-[1.000e-04 0.000e+00 2.300e-03 1.000e-04 5.000e-04 7.950e-02 2.000e-04
- 1.286e-01 2.060e-02 7.681e-01]
+[3.000e-04 0.000e+00 4.000e-04 4.000e-04 1.800e-03 3.460e-02 9.000e-04
+ 2.917e-01 1.560e-02 6.543e-01]
 Clase predicha: Boton (indice 9)
 Clase real: Boton (indice 9)
 ```
@@ -178,15 +178,15 @@ Clase real: Boton (indice 9)
 
 ## 7. Parte 3 — Análisis comparativo entre ambos dominios
 
-**1. Comparativa de métricas de entrenamiento.** Tras la única época de entrenamiento, MNIST alcanzó una **precisión de 77.48%** con una **pérdida de 0.8078**, mientras que Fashion-MNIST alcanzó **64.04%** de precisión con una **pérdida de 1.0235**. La red aprende de forma más rápida y eficiente sobre MNIST: con el mismo número de muestras (5000), el mismo número de pasos (79 batches) y la misma arquitectura base, el modelo de dígitos ya clasifica correctamente a 3 de cada 4 ejemplos, mientras que el de prendas apenas supera los 3 de cada 5. Esto es consistente con que los dígitos son patrones visuales más simples y uniformes de aprender que las prendas de vestir.
+**1. Comparativa de métricas de entrenamiento.** Tras la única época de entrenamiento, MNIST alcanzó una **precisión de 75.12%** con una **pérdida de 0.8471**, mientras que Fashion-MNIST alcanzó **65.80%** de precisión con una **pérdida de 1.0273**. La red aprende de forma más rápida y eficiente sobre MNIST: con el mismo número de muestras (5000), el mismo número de pasos (79 batches) y la misma arquitectura base, el modelo de dígitos ya clasifica correctamente a 3 de cada 4 ejemplos, mientras que el de prendas apenas supera los 3 de cada 5. Esto es consistente con que los dígitos son patrones visuales más simples y uniformes de aprender que las prendas de vestir.
 
-**2. Complejidad visual y de patrones.** Los dígitos de MNIST son trazos simples, centrados y de grosor relativamente constante — básicamente curvas y líneas sobre un fondo uniforme. Las prendas de Fashion-MNIST, en cambio, tienen siluetas completas, texturas internas y formas que varían mucho según el ángulo o el estilo de la prenda (comparar una "camiseta/top" plana con un "pulóver" con mangas). Esta mayor complejidad se refleja directamente en la confianza del vector Softmax: para MNIST, la red asignó **99.97%** de probabilidad a la clase correcta, prácticamente sin ambigüedad; para Fashion-MNIST, la clase correcta ("Botón"/calzado) obtuvo solo **76.81%**, con una porción no despreciable de probabilidad repartida en clases visualmente parecidas.
+**2. Complejidad visual y de patrones.** Los dígitos de MNIST son trazos simples, centrados y de grosor relativamente constante — básicamente curvas y líneas sobre un fondo uniforme. Las prendas de Fashion-MNIST, en cambio, tienen siluetas completas, texturas internas y formas que varían mucho según el ángulo o el estilo de la prenda (comparar una "camiseta/top" plana con un "pulóver" con mangas). Esta mayor complejidad se refleja directamente en la confianza del vector Softmax: para MNIST, la red asignó **99.71%** de probabilidad a la clase correcta, prácticamente sin ambigüedad; para Fashion-MNIST, la clase correcta ("Botón"/calzado) obtuvo solo **65.43%**, con una porción no despreciable de probabilidad repartida en clases visualmente parecidas.
 
-**3. Distribución de confianza del modelo.** En MNIST se observa una probabilidad **fuertemente dominante** hacia una única clase (99.97% para el dígito 7, el resto prácticamente en cero). En Fashion-MNIST la distribución es notablemente **más dispersa**: además del 76.81% para la clase correcta ("Botón"), el vector asigna 12.86% a "Zapatilla" y 7.95% a "Sandalia" — es decir, casi toda la incertidumbre del modelo se concentra en las otras 2 categorías de calzado, no en clases aleatorias. Esto demuestra que el dominio de los datos repercute directamente en la certeza de la red: cuando las clases son visualmente muy distintas entre sí (los 10 dígitos), la red puede volverse muy segura rápidamente; cuando varias clases comparten características visuales (botín, zapatilla y sandalia son todas tipos de calzado), la red reparte probabilidad entre ellas incluso cuando acierta la predicción final.
+**3. Distribución de confianza del modelo.** En MNIST se observa una probabilidad **fuertemente dominante** hacia una única clase (99.71% para el dígito 7, el resto prácticamente en cero). En Fashion-MNIST la distribución es notablemente **más dispersa**: además del 65.43% para la clase correcta ("Botón"), el vector asigna 29.17% a "Zapatilla" y 3.46% a "Sandalia" — es decir, casi toda la incertidumbre del modelo se concentra en las otras 2 categorías de calzado, no en clases aleatorias. Esto demuestra que el dominio de los datos repercute directamente en la certeza de la red: cuando las clases son visualmente muy distintas entre sí (los 10 dígitos), la red puede volverse muy segura rápidamente; cuando varias clases comparten características visuales (botín, zapatilla y sandalia son todas tipos de calzado), la red reparte probabilidad entre ellas incluso cuando acierta la predicción final.
 
 ## 8. Conclusiones
 
-- **MNIST es un problema más sencillo que Fashion-MNIST** para esta misma arquitectura: en 1 sola época, MNIST ya logra 77.48% de precisión frente al 64.04% de Fashion-MNIST, con menor pérdida.
+- **MNIST es un problema más sencillo que Fashion-MNIST** para esta misma arquitectura: en 1 sola época, MNIST ya logra 75.12% de precisión frente al 65.80% de Fashion-MNIST, con menor pérdida.
 - **La complejidad visual del dominio se refleja en la confianza del modelo**: dígitos simples producen distribuciones Softmax casi binarias (una clase cercana al 100%); prendas con siluetas superpuestas (calzado) producen distribuciones más repartidas entre las clases visualmente similares.
 - **Ampliar la capa densa oculta (64→128) aumenta considerablemente los parámetros entrenables** (+84.6%) sin tocar la parte convolucional, una decisión razonable para un dominio visualmente más complejo.
 - El único problema real encontrado en el código proporcionado fue un **error de sintaxis** en la última línea de `fashion_cnn.py` (llave sobrante en un f-string), corregido y documentado en la Sección 4; el resto de la arquitectura, entrenamiento y lógica de predicción de la guía funcionan exactamente como se describen.
