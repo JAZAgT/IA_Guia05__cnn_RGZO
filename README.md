@@ -178,6 +178,18 @@ Clase real: Boton (indice 9)
 
 ## 7. Parte 3 — Análisis comparativo entre ambos dominios
 
+### 7.1 Aclaración: Accuracy del entrenamiento vs. Confianza de una predicción individual
+
+Antes de comparar los resultados, conviene aclarar la diferencia entre 2 métricas que aparecen en este informe y que, aunque ambas se expresen como porcentajes, **no miden lo mismo**.
+
+**Accuracy (precisión del entrenamiento, 75.12% / 65.80%).** Es una métrica **agregada**: representa el porcentaje de aciertos del modelo sobre las 5000 muestras de entrenamiento, promediado a lo largo de los 79 batches de la única época. Como los pesos de la red se van actualizando batch a batch, ese promedio mezcla los aciertos de los primeros batches (cuando el modelo apenas comenzaba a aprender, con pesos casi aleatorios) con los de los últimos (cuando ya había mejorado algo). Por eso, con solo **1 época** y **5000 muestras** (en vez de las 60 000 disponibles en cada dataset), un accuracy de 75.12% (MNIST) o 65.80% (Fashion-MNIST) es un resultado **esperado y razonable para una demostración rápida**, no el de un modelo final optimizado: entrenando más épocas sobre el dataset completo, esta misma arquitectura suele superar el 98% en MNIST y el 88-90% en Fashion-MNIST.
+
+**Confianza de una predicción individual (99.71% / 65.43%, el valor máximo del vector Softmax).** Es una métrica **puntual**: corresponde a una sola imagen de prueba (`X_test[0]`), nunca vista durante el entrenamiento, y no es ningún promedio. Representa qué tan convencida está la red, ya entrenada tras la época, de su propia respuesta para ese caso particular.
+
+Que el accuracy del entrenamiento sea moderado y que, al mismo tiempo, la confianza en una predicción puntual sea muy alta **no es contradictorio**: el modelo puede fallar en una parte de las imágenes en general, pero frente a una imagen puntual especialmente clara (como el dígito 7 analizado) puede estar muy seguro y acertar. Es equivalente a decir que alguien acierta el 75% de las preguntas de un examen, pero en una pregunta puntual estaba 99% seguro de su respuesta y la acertó: una mide el desempeño **general** del modelo, la otra la **certeza en un caso individual**, y son escalas independientes entre sí.
+
+### 7.2 Comparativa de métricas, complejidad visual y distribución de confianza
+
 **1. Comparativa de métricas de entrenamiento.** Tras la única época de entrenamiento, MNIST alcanzó una **precisión de 75.12%** con una **pérdida de 0.8471**, mientras que Fashion-MNIST alcanzó **65.80%** de precisión con una **pérdida de 1.0273**. La red aprende de forma más rápida y eficiente sobre MNIST: con el mismo número de muestras (5000), el mismo número de pasos (79 batches) y la misma arquitectura base, el modelo de dígitos ya clasifica correctamente a 3 de cada 4 ejemplos, mientras que el de prendas apenas supera los 3 de cada 5. Esto es consistente con que los dígitos son patrones visuales más simples y uniformes de aprender que las prendas de vestir.
 
 **2. Complejidad visual y de patrones.** Los dígitos de MNIST son trazos simples, centrados y de grosor relativamente constante — básicamente curvas y líneas sobre un fondo uniforme. Las prendas de Fashion-MNIST, en cambio, tienen siluetas completas, texturas internas y formas que varían mucho según el ángulo o el estilo de la prenda (comparar una "camiseta/top" plana con un "pulóver" con mangas). Esta mayor complejidad se refleja directamente en la confianza del vector Softmax: para MNIST, la red asignó **99.71%** de probabilidad a la clase correcta, prácticamente sin ambigüedad; para Fashion-MNIST, la clase correcta ("Botón"/calzado) obtuvo solo **65.43%**, con una porción no despreciable de probabilidad repartida en clases visualmente parecidas.
@@ -187,6 +199,7 @@ Clase real: Boton (indice 9)
 ## 8. Conclusiones
 
 - **MNIST es un problema más sencillo que Fashion-MNIST** para esta misma arquitectura: en 1 sola época, MNIST ya logra 75.12% de precisión frente al 65.80% de Fashion-MNIST, con menor pérdida.
+- **El accuracy del entrenamiento y la confianza de una predicción individual son métricas distintas** (ver Sección 7.1): la primera es un promedio agregado sobre 5000 muestras en 1 época (por eso es moderada), mientras que la segunda es la certeza del modelo ya entrenado frente a un único caso puntual; que una sea moderada y la otra muy alta no es ninguna contradicción.
 - **La complejidad visual del dominio se refleja en la confianza del modelo**: dígitos simples producen distribuciones Softmax casi binarias (una clase cercana al 100%); prendas con siluetas superpuestas (calzado) producen distribuciones más repartidas entre las clases visualmente similares.
 - **Ampliar la capa densa oculta (64→128) aumenta considerablemente los parámetros entrenables** (+84.6%) sin tocar la parte convolucional, una decisión razonable para un dominio visualmente más complejo.
 - El único problema real encontrado en el código proporcionado fue un **error de sintaxis** en la última línea de `fashion_cnn.py` (llave sobrante en un f-string), corregido y documentado en la Sección 4; el resto de la arquitectura, entrenamiento y lógica de predicción de la guía funcionan exactamente como se describen.
